@@ -4,7 +4,8 @@ Module.register("MMM-LLAMAAssistant", {
   defaults: {
     apiUrl: "http://192.168.178.41:11434", // LLAMA3.2 API URL
     triggerKey: "Shift", // Optional: Taste, um die Spracherkennung manuell zu starten (nicht notwendig für kontinuierliches Zuhören)
-    logLevel: "debug", // Log-Level für detaillierte Informationen (info, debug, error)
+    logLevel: "debug", // Log-Level für detaillierte Informationen (info, debug, error),
+    soundFile: "sounds/startup.mp3" // Pfad zur Audiodatei, die abgespielt werden soll
   },
 
   start: function () {
@@ -15,6 +16,7 @@ Module.register("MMM-LLAMAAssistant", {
     this.setupRecognition();
     this.ollamaClient = new Ollama.Client(); // Erstellt einen Ollama API-Client
     this.startContinuousListening();
+    this.playStartupSound(); // Sound abspielen, sobald der Assistent gestartet wurde
   },
 
   getDom: function () {
@@ -46,7 +48,6 @@ Module.register("MMM-LLAMAAssistant", {
         this.logToTerminal("Recognition ended. Restarting...", "debug");
         this.isListening = false;
         this.updateMicIcon();
-        // Restart the recognition automatically to keep listening
         this.startContinuousListening();
       };
 
@@ -101,6 +102,18 @@ Module.register("MMM-LLAMAAssistant", {
     } else {
       this.logToTerminal("Speech Synthesis not supported", "error");
     }
+  },
+
+  // Sound abspielen beim Start
+  playStartupSound: function () {
+    const audio = new Audio(this.file(this.config.soundFile));
+    audio.play()
+      .then(() => {
+        this.logToTerminal("Startup sound played", "info");
+      })
+      .catch((error) => {
+        this.logToTerminal(`Error playing startup sound: ${error}`, "error");
+      });
   },
 
   // Helper-Funktion: Übergibt Infos ans Terminal und liest Parameter ein
