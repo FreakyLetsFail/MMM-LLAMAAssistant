@@ -1,11 +1,15 @@
-const Ollama = require('ollama'); // Importiere das Ollama-Paket
-
 Module.register("MMM-LLAMAAssistant", {
   defaults: {
-    apiUrl: "http://192.168.178.41:11434", // LLAMA3.2 API URL
+    apiUrl: "http://192.168.178.41:11434/api/generate", // LLAMA3.2 API URL
     triggerKey: "Shift", // Optional: Taste, um die Spracherkennung manuell zu starten (nicht notwendig für kontinuierliches Zuhören)
     logLevel: "debug", // Log-Level für detaillierte Informationen (info, debug, error),
     soundFile: "sounds/startup.mp3" // Pfad zur Audiodatei, die abgespielt werden soll
+  },
+
+  getScripts: function() {
+    return [
+      "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    ];
   },
 
   start: function () {
@@ -14,7 +18,6 @@ Module.register("MMM-LLAMAAssistant", {
     this.recognition = null;
     this.synth = window.speechSynthesis;
     this.setupRecognition();
-    this.ollamaClient = new Ollama.Client(); // Erstellt einen Ollama API-Client
     this.startContinuousListening();
     this.playStartupSound(); // Sound abspielen, sobald der Assistent gestartet wurde
   },
@@ -85,9 +88,17 @@ Module.register("MMM-LLAMAAssistant", {
     };
 
     try {
-      const response = await this.ollamaClient.generate(query); // Verwende Ollama API zur Abfrage
-      this.logToTerminal(`LLAMA response: ${response.text || response}`, "info");
-      this.speakResponse(response.text || response);
+      const response = await fetch(this.config.apiUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(query)
+      });
+      
+      const result = await response.json();
+      this.logToTerminal(`LLAMA response: ${result.text || result}`, "info");
+      this.speakResponse(result.text || result);
     } catch (error) {
       this.logToTerminal(`Error communicating with LLAMA API: ${error}`, "error");
     }
