@@ -16,10 +16,11 @@ Module.register("MMM-LLAMAAssistant", {
 
   start: function () {
     Log.info("Starting module: " + this.name);
+    Log.info("LLMA3.2");
     this.isListening = false;
     this.recognition = null;
     this.synth = window.speechSynthesis;
-    this.assistantClient = new Assistent(this.config.apiUrl, "llama2"); // Assistent-Client instanziieren
+    this.assistantClient = new Assistent(this.config.apiUrl, "llama3.2"); // Assistent-Client instanziieren
     this.setupRecognition();
     this.startContinuousListening();
     this.playStartupSound(); // Sound abspielen, sobald der Assistent gestartet wurde
