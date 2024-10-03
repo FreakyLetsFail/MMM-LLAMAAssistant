@@ -1,7 +1,9 @@
+const Assistent = require('./assistent'); // Importiere den Custom Client
+
 Module.register("MMM-LLAMAAssistant", {
   defaults: {
     apiUrl: "http://192.168.178.41:11434/api/generate", // LLAMA3.2 API URL
-    triggerKey: "Shift", // Optional: Taste, um die Spracherkennung manuell zu starten (nicht notwendig für kontinuierliches Zuhören)
+    triggerKey: "", // Optional: Taste, um die Spracherkennung manuell zu starten (nicht notwendig für kontinuierliches Zuhören)
     logLevel: "debug", // Log-Level für detaillierte Informationen (info, debug, error),
     soundFile: "sounds/startup.mp3" // Pfad zur Audiodatei, die abgespielt werden soll
   },
@@ -17,6 +19,7 @@ Module.register("MMM-LLAMAAssistant", {
     this.isListening = false;
     this.recognition = null;
     this.synth = window.speechSynthesis;
+    this.assistantClient = new Assistent(this.config.apiUrl, "llama2"); // Assistent-Client instanziieren
     this.setupRecognition();
     this.startContinuousListening();
     this.playStartupSound(); // Sound abspielen, sobald der Assistent gestartet wurde
@@ -57,7 +60,7 @@ Module.register("MMM-LLAMAAssistant", {
       this.recognition.onresult = (event) => {
         const transcript = event.results[0][0].transcript;
         this.logToTerminal(`Recognized speech: ${transcript}`, "debug");
-        this.sendQueryToLLAMA(transcript);
+        this.sendQueryToLLAMA(transcript); // Sende den erkannten Text an die API
       };
 
     } catch (e) {
@@ -81,24 +84,12 @@ Module.register("MMM-LLAMAAssistant", {
     }
   },
 
+  // Verwende den Assistent-Client, um die Anfrage an LLAMA zu senden
   sendQueryToLLAMA: async function (text) {
-    const query = {
-      model: "llama2", // Das Modell, das auf der API verwendet wird
-      prompt: text,
-    };
-
     try {
-      const response = await fetch(this.config.apiUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(query)
-      });
-      
-      const result = await response.json();
-      this.logToTerminal(`LLAMA response: ${result.text || result}`, "info");
-      this.speakResponse(result.text || result);
+      const response = await this.assistantClient.sendPrompt(text); // Verwende die Methode aus dem Assistent-Client
+      this.logToTerminal(`LLAMA response: ${response}`, "info");
+      this.speakResponse(response);
     } catch (error) {
       this.logToTerminal(`Error communicating with LLAMA API: ${error}`, "error");
     }
