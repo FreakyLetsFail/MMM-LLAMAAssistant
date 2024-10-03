@@ -1,0 +1,39 @@
+/* MMM-LLAMAAssistant.css */
+
+.LLAMAAssistant {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    cursor: pointer;
+  }
+  
+  .LLAMAAssistant .mic-icon {
+    font-size: 3em;
+    color: #fff;
+    opacity: 0.7;
+    transition: opacity 0.3s;
+  }
+  
+  .LLAMAAssistant .mic-icon:hover {
+    opacity: 1;
+  }
+  
+  .LLAMAAssistant .mic-icon.listening {
+    color: #ff4081; /* Farbe ändern, wenn aktiv */
+    animation: pulse 1s infinite;
+  }
+  
+  @keyframes pulse {
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.1);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  
