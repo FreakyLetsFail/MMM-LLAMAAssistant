@@ -1,8 +1,8 @@
-const Assistent = require('./assistent'); // Importiere den Custom Client
+const Assistent = require('./Assistant.js'); // Importiere den Custom Client
 
 Module.register("MMM-LLAMAAssistant", {
   defaults: {
-    apiUrl: "http://192.168.178.41:11434/api/generate", // LLAMA3.2 API URL
+    apiUrl: "http://192.168.178.41:11434/api/chat", // LLAMA3.2 Chat API URL
     triggerKey: "", // Optional: Taste, um die Spracherkennung manuell zu starten (nicht notwendig für kontinuierliches Zuhören)
     logLevel: "debug", // Log-Level für detaillierte Informationen (info, debug, error),
     soundFile: "sounds/startup.mp3" // Pfad zur Audiodatei, die abgespielt werden soll
